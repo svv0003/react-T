@@ -9,7 +9,9 @@ import PropsEx1 from "./components/R03_Props1";
 import MyProfile from "./components/practices/MyProfile";
 import Greeting from "./components/practices/Greeting";
 import Product from "./components/practices/Product";
-import Weather from "./components/practices/Weather"; // css 를 얻어오고 아래 작성된 컴포넌트에 적용
+import Weather from "./components/practices/Weather";
+import PropsEx3 from "./components/R05_Props3";
+import ChildComponent from "./components/R06_Props4"; // css 를 얻어오고 아래 작성된 컴포넌트에 적용
 /* App 컴포넌트 (최상위 컴포넌트)
 *
 * 보통 맨 최상위 컴포넌트는 function 을 사용하여 최상위임을 표기
@@ -39,8 +41,9 @@ function App() {
        */}
        <PropsEx1 num='1' name='홍길동' age='20' score='90'/>
        <PropsEx1  name='고말숙' age='30' num='2' score='100'/>
-
-
+       <PropsEx3 name="강감찬" age='72' gender='남자' />
+       <ChildComponent name={'고말숙'}/>
+       <ChildComponent name={'김영희'}/>
        <MyProfile
            name="홍길동"
            age={20}
