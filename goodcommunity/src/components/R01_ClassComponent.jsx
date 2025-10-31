@@ -31,11 +31,17 @@ import React, {Component} from "react";
 class ComponentEx extends Component{
     /* js 를 작성하는 공간이기 때문에 script 주석사용 */
 
+    constructor(props) {
+        super(props);
+    }
+
     // render() 함수 :
     // return 되는 html 형식의 코드(jsx, js + xml) 를 화면에 출력하는 함수
     // 화면이 변경되어야 할 시점에 자동으로 호출됨
     // Component를 상속 받은  하위 클래스에 반드시 있어야 하는 함수
     render() {
+    /* js 를 작성하는 공간이기 때문에 script 주석사용 */
+        const value = 10;
         return(
             <>
                 {/* js or jsx로 React 화 된 html 내부 주석 사용 */}
