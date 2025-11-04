@@ -6,13 +6,22 @@ const TodoInput = () => {
     // 2. input onChange 이벤트 핸들러 만들기
     // 3. 추가 버튼 클릭 핸들러 만들기
     const [todo, setTodo] = useState('');
+    const handleInputChange = (e) => {
+        setTodo(e.target.value);
+    }
+    
+    const handleAddTodo = () => {
+        if(todo.trim()) {
+            alert(`할일이 추가되었습니다. ${todo}`);
+            setTodo(''); //입력 필드 초기화
+        }
+    }
     return (
         <div>
             <h2>할일 입력</h2>
             {/* input */}
             <input
                 type="text"
-                value={todo}
                 placeholder="할 일을 입력하세요." />
             {/* 글자 수 표시 */}
             <div>글자 수 : {todo.length}/50</div>
@@ -22,7 +31,7 @@ const TodoInput = () => {
 
             )}
             {/* 추가 버튼 (비어있으면 비활성화) */}
-            <button  disabled={todo.trim() === ''} >추가</button>
+            <button onClick={handleAddTodo} disabled={todo.trim() === ''} >추가</button>
             {/* 입력한 내용 미리보기 */}
             {todo && (
                 <div>입력한 내용 : {todo}</div>
