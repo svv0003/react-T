@@ -13,7 +13,6 @@ const TodoInput = () => {
             <input
                 type="text"
                 value={todo}
-                onChange={handleChange}
                 placeholder="할 일을 입력하세요." />
             {/* 글자 수 표시 */}
             <div>글자 수 : {todo.length}/50</div>
@@ -23,7 +22,7 @@ const TodoInput = () => {
 
             )}
             {/* 추가 버튼 (비어있으면 비활성화) */}
-            <button onClick={} disabled={todo.trim() === ''} >추가</button>
+            <button  disabled={todo.trim() === ''} >추가</button>
             {/* 입력한 내용 미리보기 */}
             {todo && (
                 <div>입력한 내용 : {todo}</div>
