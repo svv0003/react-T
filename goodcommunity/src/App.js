@@ -15,7 +15,8 @@ import ChildComponent from "./components/R06_Props4";
 import R08_State1 from "./components/R08_State1";
 import State2 from "./components/R09_State2";
 import ParentComponent from "./components/R10_State3";
-import ParentState from "./components/R10_State3_Components/ParentState"; // css 를 얻어오고 아래 작성된 컴포넌트에 적용
+import ParentState from "./components/R10_State3_Components/ParentState";
+import Parent from "./components/R12_Context2"; // css 를 얻어오고 아래 작성된 컴포넌트에 적용
 /* App 컴포넌트 (최상위 컴포넌트)
 *
 * 보통 맨 최상위 컴포넌트는 function 을 사용하여 최상위임을 표기
@@ -33,9 +34,9 @@ function App() {
        */
    <>
        {/* 반드시 return 에서 시작과 끝을 감싸는 태그 하나 필요*/}
-       {/*<ParentComponent />*/}
-       <ParentState />
-
+       {/*<ParentComponent />
+       <ParentState />*/}
+        <Parent />
 
        {/*
        <R08_State1 />
