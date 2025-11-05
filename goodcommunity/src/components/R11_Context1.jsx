@@ -1,3 +1,22 @@
+/*
+Context의 흐름
+Parent     (Provider 로 기본값 제공)
+  ↓
+Child      (값을 사용하지 않고 통과)
+  ↓
+GrandChild (useContext로  값을 사용)
+===================================
+Context를 사용하지 않을 경우
+<Parent>
+   <Child value={data}> --> data를 이용할 필요가 없지만, Grand 에 data를 전달하기 위해 값을 가지고 있어야하는 상황
+        <GrandChild value={data} />
+   </Child>
+</Parent>
+Context를 사용하는 경우
+Parent Component
+   Child Component
+      GrandChild Component useContext 를 이용해서 Parent  에서 전달한 값을 사용할 수 있다.
+ */
 import {createContext, useContext} from "react";
 /* 1. Context 객체 생성
 
