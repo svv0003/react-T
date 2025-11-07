@@ -44,7 +44,8 @@ const Main = () => {
                 */}
                 {boards.map((b => (
                     <li> {b.title}</li>
-                )))}
+                )
+                ))}
 
         </ul>
 
