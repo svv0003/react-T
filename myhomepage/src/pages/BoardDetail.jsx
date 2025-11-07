@@ -28,6 +28,7 @@ const BoardDetail = () => {
     }
     return (
         <div className="page-container">
+            <h1 className="board-detail-title">{board.title}</h1>
             <div className="board-detail-info">
                 <span>작성자 : {board.writer}</span>
                 <span>조회수 : {board.viewCount}</span>
