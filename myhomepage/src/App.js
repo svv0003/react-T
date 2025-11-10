@@ -23,6 +23,7 @@ function App() {
                     <NavLink to="/">메인</NavLink>
                     <NavLink to="/board">게시판</NavLink>
                     <NavLink to="/write">글쓰기</NavLink>
+                    <NavLink to="/login">로그인</NavLink>
                 </div>
             </nav>
 
