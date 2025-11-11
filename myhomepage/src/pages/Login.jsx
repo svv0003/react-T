@@ -104,7 +104,7 @@ const Login = () => {
                     setMessage(result.message);
                 }
             })
-        
+            .catch(err => setMessage('로그인 중 오류가 발생했습니다.'));
         
         
     /*
