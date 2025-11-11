@@ -33,7 +33,7 @@ function App() {
                         <>
                             <NavLink to="/write">글쓰기</NavLink>
                             <NavLink to="/mypage">마이페이지</NavLink>
-                           <span className="user-email">{user?.memberEmail}</span>
+                            <span className="user-email">{user?.memberEmail}</span>
                         </>
                     ) :   ( <NavLink to="/login">로그인</NavLink>)
                     }
