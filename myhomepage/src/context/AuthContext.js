@@ -36,7 +36,7 @@ const AuthProvider = ({children}) => {
         axios.get(API_AUTH_URL+"/check", {
             withCredentials:true })
             .then(res => {
-                console.log("로그인 상태 확인 응답 : ", res.data);
+                //    console.log("로그인 상태 확인 응답 : ", res.data);
 
                 setUser(res.data.user);
             })
@@ -72,7 +72,7 @@ const AuthProvider = ({children}) => {
                         }
                     }
 
-            })
+                })
             .catch( err => {
                 console.error("로그인 에러 : ", err);
                 return {
@@ -83,7 +83,7 @@ const AuthProvider = ({children}) => {
     };
 
     const logoutFn = () => {
-       return axios.post(API_AUTH_URL+'/logout',
+        return axios.post(API_AUTH_URL+'/logout',
             {},{withCredentials:true}            )
             .then(res => {
                 console.log("로그아웃 응답 : ", res.data);
@@ -101,7 +101,7 @@ const AuthProvider = ({children}) => {
         loading,                     // 로딩상태
         loginFn,                    // 로그인 함수
         logoutFn,                  // 로그아웃 함수
-       // isAuthenticated:!user   // 로그인 여부(true / false) 제공될 것
+        // isAuthenticated:!user   // 로그인 여부(true / false) 제공될 것
         isAuthenticated:!!user   // 로그인 여부(true / false) 제공될 것
 
     };

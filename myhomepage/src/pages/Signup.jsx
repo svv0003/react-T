@@ -11,8 +11,6 @@ const Signup = () => {
         memberPw:'',
         memberPwConfirm:'',
         authKey:''
-        /* 집주소, 전화번호 추가예정 */
-
     });
 // 클라이언트가 회사가 원하는 방향으로 정보를 작성하지 않았을 경우 띄워주는 메세지 초기 표기
     const [message, setMessage] = useState({
@@ -38,24 +36,19 @@ const Signup = () => {
     const timerRef =useRef(null);
 
 
-    // 초의 경우 지속적으로 1초마다 시간을 줄이고, 0분 0초 일 경우 인증 실패 처리
-    // 3분 00초일 경우 59 초부터 다시 시작하도록 세팅
     useEffect(() => {
         if(timer.active) {
             timerRef.current = setInterval(() => {
                 setTimer( p => {
-                    // 분 초가 모두 0일 때 시간초 중지하고, 인증 실패로 종결
                     if(p.min === 0 && p.sec === 0 ) {
                         clearInterval(timerRef.current);
                         setCheckObj(p => ({...p,authKey: false}));
                         setMessage(p => ({...p, authKey: '시간이 만료되었습니다.'}));
                         return {...p, active:false};
                     }
-                    // 초가 0 일 때는 59초부터 다시시작
                     if(p.sec === 0) {
                         return  { min: p.min -1 , sec:59, active:true};
                     }
-                    // 이외에는 초를 1초마다 -1 씩 줄여서 전달
                     return  {...p, sec: p.sec -1};
                 });
             },1000);
@@ -63,60 +56,64 @@ const Signup = () => {
         return () => clearInterval(timerRef.current);
     }, [timer.active]);
 
-
-    /*
-    handleSubmit handleChange 의 경우 특정 값을 반환하는 것이 아니라
-    기능을 수행하는 목적을 가진 메서드
-    zeroPlus 의 경우 메서드를 수행한 후, 수행된 결과를 표기
-    zeroPlus 기능을 실행하고, 실행된 결과를 반환하는 return 이  필요
-
-    1번 zeroPlus 기능
     const zeroPlus = (num) => {
-       js 기능을 추가적으로 작성하고 , 작성된 결과를 return 반환하여 html 형태로 전달
-       return(
-        num < 10 ? `0${num}` : num
-       )
-    }
-
-    2번 zeroPlus 기능
-    {} 내부에 기능이 존재하고, 존재하는 기능의 결과를 삼항연산자를 이용해서 결과 반환하여 전달
-    전달반환하는 return() 이 생략되서 에러 발생
-    const zeroPlus = (num) => {  num < 10 ? `0${num}` : num }
-
-
-    3번 zeroPlus 기능
-    {} 작성을 생략하고 바로 return() 반환하는 형태로 작성으로 문제가 없음
-    const zeroPlus = (num) => ( num < 10 ? `0${num}` : num )
-    * */
-    const zeroPlus = (num) => {
-       return(
-        num < 10 ? `0${num}` : num
-       )
+        return(
+            num < 10 ? `0${num}` : num
+        )
     };
 
-    // 인증키와 관련된 백엔드 기능을 수행하고, 수행한 결과를 표기 하기 위하여
-    // 백엔드가 실행되고, 실행된 결과를 res.status 형태로 반환하기 전까지 js 하위기능 잠시 멈춤 처리
     const sendAuthKey = async  () => {
-        // 기존 인증실패해서 0분 0초인 상태를 4분 59초 형태로 변환하기
         clearInterval(timerRef.current);
         setTimer({min:4, sec:59, active:false});
-        // 백엔드 응답 결과를 res 라는 변수이름에 담아두기
-       const res =  await  axios.post('/api/email/signup',
-                            formData.memberEmail, // form 데이터에서 email 전달
-                    {
-                        headers: {'Content-Type': 'application/json'} // 글자형태로 전달설정
-                    }
+        const res =  await  axios.post('http://localhost:8085/api/email/signup',
+            formData.memberEmail,
+            {
+                headers: {'Content-Type': 'application/json'}
+            }
         );
-       if(res.data == 1){
-           setMessage(prev => ({...prev,authKey: '05:00'}));
-           setTimer({min:4, sec:59, active: true});
-           alert('인증번호가 발송되었습니다.');
-       } else {
-           alert('인증번호 발송 중 오류가 발생했습니다.');
-       }
+        if(res.data && res.data !== null){
+            setMessage(prev => ({...prev,authKey: '05:00'}));
+            setTimer({min:4, sec:59, active: true});
+            alert('인증번호가 발송되었습니다.');
+        } else {
+            alert('인증번호 발송 중 오류가 발생했습니다.');
+        }
     }
 
 
+    const checkAuthKey = async () => {
+        if(timer.min === 0 && timer.sec ===0) {
+            alert('인증번호 입력 시간을 초과하였습니다.');
+            return;
+        }
+        if (formData.authKey.length < 6 || formData.authKey.length > 6) {
+            alert('인증번호를 정확히 입력해주세요.');
+            return;
+        }
+        try {
+            const r = await axios.post(
+                'http://localhost:8085/api/email/checkAuthKey',
+                {
+                    email: formData.memberEmail,
+                    authKey: formData.authKey
+                }
+            )
+            console.log("r.data:", r.data);
+            if (r.data && r.data !== null) {
+                clearInterval(timerRef.current);
+                setTimer({min:0,sec: 0,active: false});
+                setMessage(prev => ({...prev, authKey: '인증되었습니다.'}));
+                setCheckObj(prev =>({...prev,authKey: true}));
+                alert("인증이 완료되었습니다.");
+            } else {
+                setCheckObj(prev =>({...prev,authKey: false}));
+                alert('인증번호가 일치하지 않습니다.');
+            }
+        } catch (err) { // 백엔드연결시도를 실패했을경우
+            alert("인증 확인 중 서버에 연결되지 않는 오류가 발생했습니다.");
+
+        }
+    }
 
 
 
@@ -163,15 +160,15 @@ const Signup = () => {
             memberEmail:formData.memberEmail,
             memberPassword:formData.memberPw,
         }
-        const res = await axios.post("/api/auth/signup",signupData);
+        const res = await axios.post("http://localhost:8085/api/auth/signup",signupData);
         if(res.data === "success" || res.status === 200) {
             console.log("res.data   : ",res.data);
             console.log("res.status : ",res.status);
             alert('회원가입이 완료되었습니다.');
             window.location.href="/";
         }  else if(res.data === "duplicate" )
-             alert("이미 가입된 이메일 입니다.");
-           else
+            alert("이미 가입된 이메일 입니다.");
+        else
             alert("회원가입에 실패하였습니다.");
 
 
@@ -197,13 +194,7 @@ const Signup = () => {
     const handleChange = (e) =>{
         const {name, value} = e.target;
         setFormData(p => ({
-            // p 기존의 name과 name 에 해당하는 value 데이터 보유한 변수이름
-            // ...p : 기존 name 키 value 데이터의 값에
-            //     , [name] : value 이벤트가 감지된 name의 value 값으로
-            //         데이터를 수정해서 추가
-            //          없던 키-값 을 추가해서
-            // formData 변수이름에 setter 로 저장
-                ...p, [name] :value
+            ...p, [name] :value
 
         }))
     }
@@ -214,6 +205,7 @@ const Signup = () => {
 
                 <label htmlFor="memberEmail">
                     <span className="required">*</span> 아이디(이메일)
+                    <span className="signUp-message" id="emailMessage">{message.email}</span>
                 </label>
 
                 <div className="signUp-input-area">
@@ -223,24 +215,47 @@ const Signup = () => {
                            onChange={handleChange}
                            placeholder="아이디(이메일)" maxLength="30"/>
 
-                    <button id="sendAuthKeyBtn" type="button">인증번호 받기</button>
+                    <button id="sendAuthKeyBtn"
+                            onClick={sendAuthKey}
+                            type="button"
+                    >인증번호 받기</button>
                 </div>
 
-                <span className="signUp-message" id="emailMessage">메일을 받을 수 있는 이메일을 입력해주세요.</span>
 
 
                 <label htmlFor="emailCheck">
                     <span className="required">*</span> 인증번호
+                    <span className="signUp-message" id="authKeyMessage">
+                    {timer.active && (
+                        <span style={{color: 'red', fontWeight: 'bold'}}>
+                            {zeroPlus(timer.min)}:{zeroPlus((timer.sec))}
+                        </span>
+                    )}
+                        {!timer.active && message.authKey && (
+                            <span style={{color: checkObj.authKey ?'green' : 'red'}}>
+                        {message.authKey}
+                    </span>
+                        )}
+                </span>
                 </label>
 
                 <div className="signUp-input-area">
-                    <input type="text" name="authKey" id="authKey" placeholder="인증번호 입력" maxLength="6"
+                    <input type="text"
+                           name="authKey"
+                           id="authKey"
+                           placeholder="인증번호 입력"
+                           value={formData.authKey}
+                           onChange={handleChange}
+                           maxLength="6"
                            autoComplete="off"/>
 
-                    <button id="checkAuthKeyBtn" type="button">인증하기</button>
+                    <button id="checkAuthKeyBtn"
+                            type="button"
+                            onClick={checkAuthKey}
+                    >인증하기</button>
                 </div>
 
-                <span className="signUp-message" id="authKeyMessage"></span>
+
 
                 <label htmlFor="memberPw">
                     <span className="required">*</span> 비밀번호
@@ -264,12 +279,11 @@ const Signup = () => {
                            maxLength="20"/>
                 </div>
 
-                <span className="signUp-message" id="pwMessage">영어,숫자,특수문자(!,@,#,-,_) 6~20글자 사이로 입력해주세요.</span>
+                <span className="signUp-message" id="pwMessage">{message.password}</span>
 
                 <label htmlFor="memberName">
                     <span className="required">*</span> 이름
                 </label>
-
                 <div className="signUp-input-area">
                     <input type="text" name="memberName"
                            value={formData.memberName}
@@ -277,8 +291,7 @@ const Signup = () => {
                            placeholder="이름을 입력하세요."
                            maxLength="5"/>
                 </div>
-
-                <span className="signUp-message" id="nickMessage">한글 2~5글자</span>
+                <span className="signUp-message" id="nickMessage">{message.fullname}</span>
 
 
                 <label htmlFor="memberTel">
