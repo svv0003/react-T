@@ -81,7 +81,7 @@ const Board = () => {
                      시도 방법
                      1. table 제목 눌렀을 때 link onClick 후
                     */}
-                    {boards .map((b) => (
+                    {boards.map((b) => (
                         <tr key={b.id}>
                             <td onClick={() => handleIDClick(b.id)}>{b.id}</td>
                             <td onClick={() => handleIDClick(b.id)}>{b.title}</td>

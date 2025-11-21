@@ -18,8 +18,7 @@ const Main = () => {
     const fetchProducts = async () => {
         try{
             const r=  await  axios.get("http://localhost:8085/api/product/all");
-            const list = r.data.data || r.data || [];
-            setProducts(Array.isArray(list) ? list : []);
+            setProducts(r.data);
         } catch (err) {
             alert("데이터를 백엔드에서 가져올 수 없습니다.")
         }finally {
@@ -30,7 +29,10 @@ const Main = () => {
     const fetchBoards = async () => {
         try{
             const r=  await  axios.get("http://localhost:8085/api/board/popular");
-            setBoards(r.data.slice(0, 6)); // 0 ~ 5 번 까지의 상품 가져오기
+            // setBoards(r.data.slice(0, 6)); // 0 ~ 5 번 까지의 상품 가져오기
+            console.log("🔥 popular response:", r.data);
+            const list = Array.isArray(r.data) ? r.data : r.data.data;
+            setBoards(list.slice(0, 6));
         } catch (err) {
             alert("데이터를 백엔드에서 가져올 수 없습니다.")
         }finally {

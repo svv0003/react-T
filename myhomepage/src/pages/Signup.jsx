@@ -5,6 +5,7 @@ import {clear} from "@testing-library/user-event/dist/clear";
 
 const Signup = () => {
 
+    const [isEmailVerified, setIsEmailVerified] = useState(false);
     const [formData, setFormData] = useState({
         memberName:'',
         memberEmail:'',
@@ -12,7 +13,7 @@ const Signup = () => {
         memberPwConfirm:'',
         authKey:''
     });
-// 클라이언트가 회사가 원하는 방향으로 정보를 작성하지 않았을 경우 띄워주는 메세지 초기 표기
+    // 클라이언트가 회사가 원하는 방향으로 정보를 작성하지 않았을 경우 띄워주는 메세지 초기 표기
     const [message, setMessage] = useState({
         email:'받을 수 있는 이메일을 입력하세요.',
         authKey:'',
@@ -34,7 +35,6 @@ const Signup = () => {
         active:false
     });
     const timerRef =useRef(null);
-
 
     useEffect(() => {
         if(timer.active) {
@@ -63,15 +63,19 @@ const Signup = () => {
     };
 
     const sendAuthKey = async  () => {
+        if (!formData.memberEmail.includes("@")) {
+            alert("올바른 이메일을 입력해주세요.");
+            return;
+        }
         clearInterval(timerRef.current);
         setTimer({min:4, sec:59, active:false});
-        const res =  await  axios.post('http://localhost:8085/api/email/signup',
+        const res = await axios.post('http://localhost:8085/api/email/signup',
             formData.memberEmail,
             {
                 headers: {'Content-Type': 'application/json'}
             }
         );
-        if(res.data && res.data !== null){
+        if(res.data === 1){
             setMessage(prev => ({...prev,authKey: '05:00'}));
             setTimer({min:4, sec:59, active: true});
             alert('인증번호가 발송되었습니다.');
@@ -80,48 +84,40 @@ const Signup = () => {
         }
     }
 
-
     const checkAuthKey = async () => {
         if(timer.min === 0 && timer.sec ===0) {
             alert('인증번호 입력 시간을 초과하였습니다.');
             return;
         }
-        if (formData.authKey.length < 6 || formData.authKey.length > 6) {
+        if (formData.authKey.length !== 6) {
             alert('인증번호를 정확히 입력해주세요.');
             return;
         }
         try {
-            const r = await axios.post(
-                'http://localhost:8085/api/email/checkAuthKey',
-                {
-                    email: formData.memberEmail,
-                    authKey: formData.authKey
-                }
-            )
-            console.log("r.data:", r.data);
-            if (r.data && r.data !== null) {
+            const res = await axios.post("http://localhost:8085/api/email/checkAuthKey", {
+                email: formData.memberEmail,
+                authKey: formData.authKey,
+            });
+            if (res.data === 1) {
                 clearInterval(timerRef.current);
-                setTimer({min:0,sec: 0,active: false});
                 setMessage(prev => ({...prev, authKey: '인증되었습니다.'}));
                 setCheckObj(prev =>({...prev,authKey: true}));
+                setIsEmailVerified(true);
                 alert("인증이 완료되었습니다.");
             } else {
                 setCheckObj(prev =>({...prev,authKey: false}));
+                setIsEmailVerified(false);
                 alert('인증번호가 일치하지 않습니다.');
             }
-        } catch (err) { // 백엔드연결시도를 실패했을경우
-            alert("인증 확인 중 서버에 연결되지 않는 오류가 발생했습니다.");
-
+        } catch (err) {
+            alert("서버 연결 오류");
         }
     }
 
-
-
-
-
-
-
-
+    // if (!isEmailVerified) {
+    //     alert("이메일 인증을 먼저 완료해주세요!");
+    //     return;
+    // }
 
     // js 기능 추가
     /*
@@ -170,8 +166,6 @@ const Signup = () => {
             alert("이미 가입된 이메일 입니다.");
         else
             alert("회원가입에 실패하였습니다.");
-
-
         // axios.post
         // 백엔드는 무사히 저장되지만 프론트엔드에서 회원가입 실패가 뜬다.
         // 이를 해결하자
@@ -252,7 +246,9 @@ const Signup = () => {
                     <button id="checkAuthKeyBtn"
                             type="button"
                             onClick={checkAuthKey}
-                    >인증하기</button>
+                            disabled={isEmailVerified}>
+                        {isEmailVerified ? "인증 완료" : "인증하기"}
+                    </button>
                 </div>
 
 
@@ -321,7 +317,9 @@ const Signup = () => {
                     <input type="text" name="memberAddress" placeholder="상세 주소" id="detailAddress"/>
                 </div>
 
-                <button id="signUpBtn">가입하기</button>
+                <button id="signUpBtn"
+                        disabled={!isEmailVerified}
+                >가입하기</button>
             </form>
         </div>
     )
