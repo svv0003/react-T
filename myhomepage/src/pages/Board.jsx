@@ -18,13 +18,13 @@ const Board = () => {
         axios
             .get("http://localhost:8085/api/board/all")
             .then(res =>{
-                console.log("1. boards : ", boards);
+                // console.log("1. boards : ", boards);
                 // res.data 백엔드에서 가져온 데이터를
                 // boards 에 넣어주기 전 이므로, 데이터가 0 인 상태가 맞음
-                console.log("백엔드에서 가져온 데이터 : ", res.data);
-                console.log("백엔드에서 가져온 데이터를 boards 에 저장 : ", setBoards(res.data));
+                // console.log("백엔드에서 가져온 데이터 : ", res.data);
+                // console.log("백엔드에서 가져온 데이터를 boards 에 저장 : ", setBoards(res.data));
                 setBoards(res.data); // boards 변수이름에 데이터 저장기능 실행
-                console.log("2. boards : ", boards);
+                // console.log("2. boards : ", boards);
             })
             .catch( e => alert("데이터를 가져올 수 없습니다.")); // {} 생략
     }, []);
@@ -33,17 +33,22 @@ const Board = () => {
         navigate(`/board/${id}`);
     }
 
+    const moveToWrite = () => {
+        navigate("/Write");
+    }
+
     return (
         <div className="page-container">
             <div className="board-header">
                 <h1>게시판</h1>
-                <button className="button">
+                <button className="button"
+                onClick={moveToWrite}>
                     글쓰기
                 </button>
             </div>
 
             <div className="board-info">
-                <p>전체 게시물: 개</p>
+                <p>전체 게시물: {}개</p>
             </div>
 
             <table className="board-table">

@@ -3,6 +3,9 @@ import {useState} from "react";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
 
+/*
+과제 : 게시물 작성 시 작성자로 로그인 유저 이름을 가져오고, 변경 불가능하게 설정하기.
+ */
 const Write = () => {
     // form 데이터 내부 초기값
     // 작성자 -> 나중에 로그인한 아이디로 박제 변경불가하게
