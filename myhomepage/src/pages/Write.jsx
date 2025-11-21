@@ -2,6 +2,7 @@
 import {useState} from "react";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
+import {useAuth} from "../context/AuthContext";
 
 /*
 과제 : 게시물 작성 시 작성자로 로그인 유저 이름을 가져오고, 변경 불가능하게 설정하기.
@@ -11,24 +12,49 @@ const Write = () => {
     // 작성자 -> 나중에 로그인한 아이디로 박제 변경불가하게
     // react-router-dom 에 존재하는 path 주소 변경 기능 사용
     const navigate = useNavigate();
+    const { user, isAuthenticated, loading } = useAuth();
+
+
     const [formData, setFormData] = useState({
-     title:'',
-     content:'',
-     writer:'',
+     title: '',
+     content: '',
     })
 
-    const handleSubmit = (e)  => {
-      e.preventDefault(); //제출 일시 중지
-      axios.post("http://localhost:8085/api/board", formData);
-      alert("글이 작성되었습니다.");
-      navigate('/board'); // 게시물 목록 페이지 이동
-      }
+    // 로그인 안 했거나 로딩 중이면 접근 차단 (가장 안전)
+    if (loading) {
+        return <div>로딩 중</div>;
+    }
+
+    if (!isAuthenticated) {
+        return (
+            <div style={{textAlign: 'center', padding: '100px', color: 'red'}}>
+                <h2>로그인이 필요합니다!</h2>
+                <button onClick={() => navigate('/login')}>로그인 하러 가기</button>
+            </div>
+        );
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault(); //제출 일시 중지
+        const submitData = {
+            ...formData,
+            writer: user.memberName
+        };
+        try {
+            await axios.post("http://localhost:8085/api/board", submitData);
+            alert("글이 작성되었습니다.");
+            navigate('/board');
+        } catch (err) {
+            console.error("글쓰기 실패:", err);
+            alert("글 작성에 실패했습니다.");
+        }
+    }
 
     const handleChange = (e) =>{
         const {name, value} = e.target;
-        setFormData( p => ({
-            ...p, [name] : value
-        }))
+        if (name !== 'writer') { // 작성자는 수정 불가!
+            setFormData(p => ({ ...p, [name]: value }));
+        }
     }
 
     // ok를 할 경우 게시물 목록으로 돌려보내기   기능이 하나이기 때문에 if 다음 navigate 는 {} 생략 후 작성
@@ -44,11 +70,9 @@ const Write = () => {
                     <input type="text"
                            id="writer"
                            name="writer"
-                           value={formData.writer}
-                           onChange={handleChange}
-                           placeholder="작성자를 입력하세요."
-                           maxLength={50}
-                           required
+                           value={user?.memberName || '로그인 정보 없음'}
+                           placeholder={user.memberName}
+                           readOnly
                     />
                 </label>
                 <label>제목 :

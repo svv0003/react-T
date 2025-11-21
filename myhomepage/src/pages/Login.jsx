@@ -126,7 +126,7 @@ const Login = () => {
     */
 
 
-        ; // session 유지를 위한 쿠키 전송
+         // session 유지를 위한 쿠키 전송
 
 
     }

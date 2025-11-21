@@ -11,6 +11,7 @@ import BoardDetail from "./pages/BoardDetail";
 import {useAuth} from "./context/AuthContext";
 import NotificationToast from "./components/NotificationToast";
 import Chat from "./chat/Chat";
+import ProductUpload from "./pages/ProductUpload";
 // 단순히 가져와서 적용할 때는 from 생략
 // 1. 라우팅에 필요한 컴포넌트 임포트
 //    공통 스타일 임포트
@@ -46,6 +47,7 @@ function App() {
                         <>
                             <NavLink to="/chat">채팅</NavLink>
                             <NavLink to="/write">글쓰기</NavLink>
+                            <NavLink to="/upload">상품 업로드</NavLink>
                             <NavLink to="/mypage">마이페이지</NavLink>
                             <button onClick={handleLogout} className="logout-btn">로그아웃</button>
 
@@ -68,6 +70,7 @@ function App() {
                 <Route path="/mypage" element={<MyPage />} />
                 <Route path="/write" element={<Write />} />
                 <Route path="/chat" element={<Chat />} />
+                <Route path="/upload" element={<ProductUpload />} />
             </Routes>
 
             {/* 공통 푸터 - 모든 페이지에 보이는 footer 작성 */}
