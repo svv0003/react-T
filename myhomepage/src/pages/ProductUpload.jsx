@@ -42,9 +42,9 @@ const ProductUpload = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if(!validateForm()) {
-            return;
-        }
+        // if(!validateForm()) {
+        //     return;
+        // }
         setLoading(true);
         try {
             const r = await axios.post(

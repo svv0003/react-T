@@ -48,7 +48,7 @@ const Board = () => {
             </div>
 
             <div className="board-info">
-                <p>전체 게시물: {}개</p>
+                <p>전체 게시물: {boards.length}개</p>
             </div>
 
             <table className="board-table">

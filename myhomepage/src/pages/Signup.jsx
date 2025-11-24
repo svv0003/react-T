@@ -5,15 +5,16 @@ import {clear} from "@testing-library/user-event/dist/clear";
 
 const Signup = () => {
 
-    const [isEmailVerified, setIsEmailVerified] = useState(false);
     const [formData, setFormData] = useState({
         memberName:'',
         memberEmail:'',
         memberPw:'',
         memberPwConfirm:'',
         authKey:''
+        /* 집주소, 전화번호 추가예정 */
+
     });
-    // 클라이언트가 회사가 원하는 방향으로 정보를 작성하지 않았을 경우 띄워주는 메세지 초기 표기
+// 클라이언트가 회사가 원하는 방향으로 정보를 작성하지 않았을 경우 띄워주는 메세지 초기 표기
     const [message, setMessage] = useState({
         email:'받을 수 있는 이메일을 입력하세요.',
         authKey:'',
@@ -36,19 +37,25 @@ const Signup = () => {
     });
     const timerRef =useRef(null);
 
+
+    // 초의 경우 지속적으로 1초마다 시간을 줄이고, 0분 0초 일 경우 인증 실패 처리
+    // 3분 00초일 경우 59 초부터 다시 시작하도록 세팅
     useEffect(() => {
         if(timer.active) {
             timerRef.current = setInterval(() => {
                 setTimer( p => {
+                    // 분 초가 모두 0일 때 시간초 중지하고, 인증 실패로 종결
                     if(p.min === 0 && p.sec === 0 ) {
                         clearInterval(timerRef.current);
                         setCheckObj(p => ({...p,authKey: false}));
                         setMessage(p => ({...p, authKey: '시간이 만료되었습니다.'}));
                         return {...p, active:false};
                     }
+                    // 초가 0 일 때는 59초부터 다시시작
                     if(p.sec === 0) {
                         return  { min: p.min -1 , sec:59, active:true};
                     }
+                    // 이외에는 초를 1초마다 -1 씩 줄여서 전달
                     return  {...p, sec: p.sec -1};
                 });
             },1000);
@@ -56,26 +63,62 @@ const Signup = () => {
         return () => clearInterval(timerRef.current);
     }, [timer.active]);
 
+
+    /*
+    handleSubmit handleChange 의 경우 특정 값을 반환하는 것이 아니라
+    기능을 수행하는 목적을 가진 메서드
+    zeroPlus 의 경우 메서드를 수행한 후, 수행된 결과를 표기
+    zeroPlus 기능을 실행하고, 실행된 결과를 반환하는 return 이  필요
+
+    1번 zeroPlus 기능
+    const zeroPlus = (num) => {
+       js 기능을 추가적으로 작성하고 , 작성된 결과를 return 반환하여 html 형태로 전달
+       return(
+        num < 10 ? `0${num}` : num
+       )
+    }
+
+    2번 zeroPlus 기능
+    {} 내부에 기능이 존재하고, 존재하는 기능의 결과를 삼항연산자를 이용해서 결과 반환하여 전달
+    전달반환하는 return() 이 생략되서 에러 발생
+    const zeroPlus = (num) => {  num < 10 ? `0${num}` : num }
+
+
+    3번 zeroPlus 기능
+    {} 작성을 생략하고 바로 return() 반환하는 형태로 작성으로 문제가 없음
+    const zeroPlus = (num) => ( num < 10 ? `0${num}` : num )
+    * */
     const zeroPlus = (num) => {
         return(
             num < 10 ? `0${num}` : num
         )
     };
 
+    // 인증키와 관련된 백엔드 기능을 수행하고, 수행한 결과를 표기 하기 위하여
+    // 백엔드가 실행되고, 실행된 결과를 res.status 형태로 반환하기 전까지 js 하위기능 잠시 멈춤 처리
     const sendAuthKey = async  () => {
-        if (!formData.memberEmail.includes("@")) {
-            alert("올바른 이메일을 입력해주세요.");
-            return;
-        }
+        // 기존 인증실패해서 0분 0초인 상태를 4분 59초 형태로 변환하기
         clearInterval(timerRef.current);
         setTimer({min:4, sec:59, active:false});
-        const res = await axios.post('http://localhost:8085/api/email/signup',
-            formData.memberEmail,
+        // 백엔드 응답 결과를 res 라는 변수이름에 담아두기
+        const res =  await  axios.post('/api/email/signup',
+            formData.memberEmail, // form 데이터에서 email 전달
             {
-                headers: {'Content-Type': 'application/json'}
+                headers: {'Content-Type': 'application/json'} // 글자형태로 전달설정
             }
         );
-        if(res.data === 1){
+        /*
+            @Override
+             public String sendMail(String htmlName, String email) {
+             백엔드에서는  String 형태로 자료형을 반환하는데
+             비교는 int 형태로 되어 있어 결과값은 항상 false 가 나옴
+
+             if (res.data == 1){
+
+         */
+        //console.log("응답 데이터 : ",res.data);
+        //console.log("응답 상태 : ", res.status);
+        if(res.data && res.data !== null){
             setMessage(prev => ({...prev,authKey: '05:00'}));
             setTimer({min:4, sec:59, active: true});
             alert('인증번호가 발송되었습니다.');
@@ -84,40 +127,63 @@ const Signup = () => {
         }
     }
 
+    // async = 중간에 기다림이 있어야하는 기능입니다.
+    // 만약에 await 가 작성되어 있는 구문은 백엔드나 다른 api에서 return 결과가 도착할 때 까지
+    // 하위 js 코드를 실행하지 않고 잠시 기다립니다.
+    // post 에서 url 과 data 는 필수 cookie 나 header 와 같은 속성전달은 선택사항
+    // post("url",{data}) 필수 형태
+    /*
+    *  == 동등 타입 변환 하며, 값만 비교
+    * === 일치 타입 변환 안함, 값 + 타입 모두 비교
+    */
     const checkAuthKey = async () => {
         if(timer.min === 0 && timer.sec ===0) {
             alert('인증번호 입력 시간을 초과하였습니다.');
             return;
         }
-        if (formData.authKey.length !== 6) {
+        if (formData.authKey.length < 6 || formData.authKey.length > 6) {
             alert('인증번호를 정확히 입력해주세요.');
             return;
         }
-        try {
-            const res = await axios.post("http://localhost:8085/api/email/checkAuthKey", {
-                email: formData.memberEmail,
-                authKey: formData.authKey,
-            });
-            if (res.data === 1) {
+
+        try { //프론트엔드에서 백엔드로 연결 시도
+            const r = await axios.post(
+                '/api/email/checkAuthKey', // 1번 데이터 보낼 백엔드 api endPoint 작성
+                {                        // 2번 어떤 데이터를 백엔드에 어떤 명칭으로 전달할 것인지 작성
+                    email: formData.memberEmail,
+                    authKey: formData.authKey
+                }                             // header 에 글자형태만 전달한다, 이미지나 파일데이터도 전달한다와 같은 구문을 작성해야할 경우 3번도 필요
+            )
+            // console.log("r.data : ",r.data);
+            // if 와 else 는 백엔드와 무사히 연결되었다는 전제하에
+            // 백엔드에서 특정데이터의 성공유무 확인일뿐,
+            // 프론트엔드와 백엔드가 제대로 연결되어있는지 확인할 수 없다.
+            // 과제 : if (r.data && r.data !== null) { ->   응답코드 1일 경우에만 인증되도록 수정
+            if (r.data && r.data !== null) {
                 clearInterval(timerRef.current);
+                setTimer({min:0,sec: 0,active: false});
                 setMessage(prev => ({...prev, authKey: '인증되었습니다.'}));
                 setCheckObj(prev =>({...prev,authKey: true}));
-                setIsEmailVerified(true);
                 alert("인증이 완료되었습니다.");
             } else {
                 setCheckObj(prev =>({...prev,authKey: false}));
-                setIsEmailVerified(false);
                 alert('인증번호가 일치하지 않습니다.');
             }
-        } catch (err) {
-            alert("서버 연결 오류");
+        } catch (err) { // 백엔드연결시도를 실패했을경우
+            alert("인증 확인 중 서버에 연결되지 않는 오류가 발생했습니다.");
+
         }
+
+
     }
 
-    // if (!isEmailVerified) {
-    //     alert("이메일 인증을 먼저 완료해주세요!");
-    //     return;
-    // }
+
+
+
+
+
+
+
 
     // js 기능 추가
     /*
@@ -156,7 +222,7 @@ const Signup = () => {
             memberEmail:formData.memberEmail,
             memberPassword:formData.memberPw,
         }
-        const res = await axios.post("http://localhost:8085/api/auth/signup",signupData);
+        const res = await axios.post("/api/auth/signup",signupData);
         if(res.data === "success" || res.status === 200) {
             console.log("res.data   : ",res.data);
             console.log("res.status : ",res.status);
@@ -166,6 +232,8 @@ const Signup = () => {
             alert("이미 가입된 이메일 입니다.");
         else
             alert("회원가입에 실패하였습니다.");
+
+
         // axios.post
         // 백엔드는 무사히 저장되지만 프론트엔드에서 회원가입 실패가 뜬다.
         // 이를 해결하자
@@ -188,6 +256,12 @@ const Signup = () => {
     const handleChange = (e) =>{
         const {name, value} = e.target;
         setFormData(p => ({
+            // p 기존의 name과 name 에 해당하는 value 데이터 보유한 변수이름
+            // ...p : 기존 name 키 value 데이터의 값에
+            //     , [name] : value 이벤트가 감지된 name의 value 값으로
+            //         데이터를 수정해서 추가
+            //          없던 키-값 을 추가해서
+            // formData 변수이름에 setter 로 저장
             ...p, [name] :value
 
         }))
@@ -246,11 +320,8 @@ const Signup = () => {
                     <button id="checkAuthKeyBtn"
                             type="button"
                             onClick={checkAuthKey}
-                            disabled={isEmailVerified}>
-                        {isEmailVerified ? "인증 완료" : "인증하기"}
-                    </button>
+                    >인증하기</button>
                 </div>
-
 
 
                 <label htmlFor="memberPw">
@@ -317,9 +388,7 @@ const Signup = () => {
                     <input type="text" name="memberAddress" placeholder="상세 주소" id="detailAddress"/>
                 </div>
 
-                <button id="signUpBtn"
-                        disabled={!isEmailVerified}
-                >가입하기</button>
+                <button id="signUpBtn">가입하기</button>
             </form>
         </div>
     )

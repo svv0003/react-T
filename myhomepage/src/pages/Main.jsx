@@ -138,7 +138,7 @@ const Main = () => {
                                         />
                                     ):(
                                         <div className="no-image">
-                                            <span>이미지 없음</span>
+                                            <img src="/static/img/default.png" alt="default"/>
                                         </div>
                                     )}
                                 </div>
@@ -146,7 +146,7 @@ const Main = () => {
                         ))}
                     </ul>
                 ): (
-                    <p className="no-data">인기글이 없습니다.</p>
+                    <p className="no-data">상품이 없습니다.</p>
                 )}
             </section>
 
