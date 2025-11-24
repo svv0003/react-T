@@ -1,7 +1,7 @@
 import {useNavigate} from "react-router-dom";
 import {useEffect, useMemo, useState} from "react";
 import axios from "axios";
-import {goToPage, pageClickHandler} from "../context/script";
+import {fetchAllProducts, goToPage, pageClickHandler} from "../context/scripts";
 
 
 const Products = () => {
@@ -16,24 +16,14 @@ const Products = () => {
 
 
     useEffect(() => {
-        fetchProduct();
+        fetchAllProducts(axios, setProducts);
     }, []);
 
     useEffect(() => {
         filterProducts();
+
     }, [selectCategory, searchKeyword, products]);
 
-    const fetchProduct = async () => {
-        try {
-            const res = await axios.get("http://localhost:8085/api/product/all");
-            setProducts(res.data);
-            setFilterProduct(res.data);
-        } catch (error) {
-            alert("상품 목록을 불러올 수 없습니다.");
-        } finally {
-            setLoading(false);
-        }
-    }
 
     const filterProducts = async () => {
         // products 를 spread 이용해서 배열 복제
@@ -51,28 +41,21 @@ const Products = () => {
         e.preventDefault();
         filterProducts();
     }
-/*
+    /*
     const handleProductClick = (id) => {
         navigate(`/product/${id}`);
     }
- */
+    */
     const handleProductClick = (id) => {
-        goToPage(navigate, `product/${id}`);
+        goToPage(navigate,`/product/${id}`)
     }
+
 
     const formatPrice = (price) => {
         return new Intl.NumberFormat("ko-KR").format(price);
     }
     if(loading){
-        return(
-            <div className="page-container">
-                <div className="loading-container">
-                    <div className="loading-spinner">
-                        <p>로딩중</p>
-                    </div>
-                </div>
-            </div>
-        );
+
     }
     return (
         <div className="page-container product-list-container">
@@ -89,7 +72,7 @@ const Products = () => {
                 {categories.map((c) => (
                     <button
                         key={c}
-                        className={`category-btn ${selectCategory === c ? "active" : ""}`}
+                        className={`category-btn ${selectCategory} === c ? "active" : ""}`}
                         onClick={() => setSelectCategory(c)}>
                         {c}
                     </button>
@@ -112,8 +95,8 @@ const Products = () => {
                 총 <strong>{filterProduct.length}</strong>개의 상품
             </div>
 
-            {/* 상품 목록 */}
-            {filterProduct.length > 0 ? (
+            {/* 상품 목록*/}
+            {filterProduct.length > 0 ?(
                 <div className="product-grid">
                     {filterProduct.map((product) => (
                         <div key={product.id}
@@ -122,9 +105,7 @@ const Products = () => {
                             <div className="product-image">
                                 {product.imageUrl ? (
                                     <img src={product.imageUrl} alt={product.productName} />
-                                )
-                                :
-                                (
+                                ) : (
                                     <img src="/static/img/default.png" alt="default" />
                                 )}
                             </div>
@@ -136,20 +117,20 @@ const Products = () => {
                                 <p className="product-code">
                                     {product.productCode}
                                 </p>
-                                <div className="product-manufacturer">
+                                <p className="product-manufacturer">
                                     {product.manufacturer}
-                                </div>
+                                </p>
                                 <div className="product-footer">
                                     <span className="product-price">
                                         {formatPrice(product.price)}원
                                     </span>
-                                    <span className={`product-stock < 10 ? "매진임박" : ""`}></span>
+                                    <span className={`product-stock ${product.stock < 10 ? "매진임박" :""}`}></span>
                                 </div>
                             </div>
                         </div>
                     ))}
-            </div>
-            ) : (
+                </div>
+            ):(
                 <div className="no-products">
                     <p>등록된 상품이 없습니다.</p>
                 </div>
