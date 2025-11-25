@@ -10,25 +10,27 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
-import {fetchAllBoards, goToPage} from "../context/scripts";
+import {fetchAllBoards, goToPage, renderLoading} from "../context/scripts";
 
 const Board = () => {
     const navigate = useNavigate();
     const [boards, setBoards] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchAllBoards(axios,setBoards);
+        fetchAllBoards(axios, setBoards, setLoading);
     }, []);
 
-    const handleIDClick = (id) => {
-        navigate(`/board/${id}`);
-    }
+    if(loading)  return renderLoading('게시물을 불러오는 중');
+
+    if(!boards) renderLoading('상품을 찾을 수 없습니다.');
+    // 또는 삼한연산자로 게시물 length 0일 때 false 위치로 renderLoading 작성한다.
 
     return (
         <div className="page-container">
             <div className="board-header">
                 <h1>게시판</h1>
-                <button className="button" onClick={() =>goToPage(navigate, '/witer')}>
+                <button className="button" onClick={() =>goToPage(navigate, '/write')}>
                     글쓰기
                 </button>
             </div>
@@ -69,8 +71,8 @@ const Board = () => {
                     */}
                 {boards .map((b) => (
                     <tr key={b.id}>
-                        <td onClick={() => handleIDClick(b.id)}>{b.id}</td>
-                        <td onClick={() => handleIDClick(b.id)}>{b.title}</td>
+                        <td onClick={() => goToPage(navigate, `/board/${b.id}`)}>{b.id}</td>
+                        <td onClick={() => goToPage(navigate, `/board/${b.id}`)}>{b.title}</td>
                         <td>{b.writer}</td>
                         <td>{b.viewCount}</td>
                         <td>{b.createdAt}</td> {/* 2025-11-07 11:38:18  -> 2025-11-07*/}

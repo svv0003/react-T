@@ -3,9 +3,24 @@ import {useState} from "react";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import {useAuth} from "../context/AuthContext";
+import {boardSave, goToPage} from "../context/scripts";
 
 /*
-과제 : 게시물 작성 시 작성자로 로그인 유저 이름을 가져오고, 변경 불가능하게 설정하기.
+user?.memberName
+user 객체가 존재하면 user.memberName 반환하고,
+user가 null 또는 undefined라면 에러 없이 undefined 반환한다.
+
+const name = user.memberName; 형식은 user null인 경우 에러 발생한다.
+
+------
+let name;
+if (user) {
+    name = user.memberName;
+} else {
+    name = undefined;
+}
+------
+user ? user.memberName : undefined
  */
 const Write = () => {
     // form 데이터 내부 초기값
@@ -16,8 +31,9 @@ const Write = () => {
 
 
     const [formData, setFormData] = useState({
-     title: '',
-     content: '',
+    title: '',
+    content: '',
+    writer: user?.memberName || '',
     })
 
     // 로그인 안 했거나 로딩 중이면 접근 차단 (가장 안전)
@@ -36,18 +52,7 @@ const Write = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault(); //제출 일시 중지
-        const submitData = {
-            ...formData,
-            writer: user.memberName
-        };
-        try {
-            await axios.post("http://localhost:8085/api/board", submitData);
-            alert("글이 작성되었습니다.");
-            navigate('/board');
-        } catch (err) {
-            console.error("글쓰기 실패:", err);
-            alert("글 작성에 실패했습니다.");
-        }
+        boardSave(axios, {...formData, writer:user?.memberName}, navigate);
     }
 
     const handleChange = (e) =>{
@@ -59,57 +64,70 @@ const Write = () => {
 
     // ok를 할 경우 게시물 목록으로 돌려보내기   기능이 하나이기 때문에 if 다음 navigate 는 {} 생략 후 작성
     const handleCancel = () => {
-        if (window.confirm("작성을 취소하시겠습니까?"))  navigate('/board');
+        if (window.confirm("작성을 취소하시겠습니까?"))  goToPage(navigate, '/board');
     }
 
     return(
         <div className="page-container">
-            <h1>글쓰기</h1>
-            <form onSubmit={handleSubmit}>
-                <label>작성자 :
-                    <input type="text"
-                           id="writer"
-                           name="writer"
-                           value={user?.memberName || '로그인 정보 없음'}
-                           placeholder={user.memberName}
-                           readOnly
-                    />
-                </label>
-                <label>제목 :
-                    <input type="text"
-                           id="title"
-                           name="title"
-                           value={formData.title}
-                           onChange={handleChange}
-                           placeholder="제목을 입력하세요."
-                           maxLength={200}
-                           required
-                    />
-                </label>
-                <label>내용 :
-                    <textarea
-                           id="content"
-                           name="content"
-                           value={formData.content}
-                           onChange={handleChange}
-                           placeholder="내용을 입력하세요."
-                           rows={15}
-                           required
-                    />
-                </label>
-                <button type="submit">
-                    작성하기
-                </button>
-                <button
-                    type="button"
-                    onClick={handleCancel}
-                >
-                    돌아가기
-                </button>
-            </form>
+        {isAuthenticated ? (
+            <>
+                <h1>글쓰기</h1>
+                <form onSubmit={handleSubmit}>
+                    {/* 로그인 상태에 따라 다른 메뉴 표시 */}
+                    <label>작성자 :
+                        <input type="text"
+                               id="writer"
+                               name="writer"
+                               className="writer-input"
+                               value={user?.memberName}
+                               placeholder={user.memberName}
+                               disabled
+                        />
+                    </label>
+                    <label>제목 :
+                        <input type="text"
+                               id="title"
+                               name="title"
+                               value={formData.title}
+                               onChange={handleChange}
+                               placeholder="제목을 입력하세요."
+                               maxLength={200}
+                               required
+                        />
+                    </label>
+                    <label>내용 :
+                        <textarea
+                               id="content"
+                               name="content"
+                               value={formData.content}
+                               onChange={handleChange}
+                               placeholder="내용을 입력하세요."
+                               rows={15}
+                               required
+                        />
+                    </label>
+                    <div className="form-buttons">
+                        <button type="submit"
+                                className="btn-submit">
+                            작성하기
+                        </button>
+                        <button
+                            type="button"
+                            className="btn-cancel"
+                            onClick={handleCancel}
+                        >
+                            돌아가기
+                        </button>
+                    </div>
+                </form>
+            </>
+            )
+        :
+            (goToPage(navigate, '/board'))
+        }
         </div>
     )
-};
+}
 
 
 

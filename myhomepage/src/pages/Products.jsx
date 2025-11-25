@@ -1,28 +1,37 @@
 import {useNavigate} from "react-router-dom";
 import {useEffect, useMemo, useState} from "react";
 import axios from "axios";
-import {fetchAllProducts, goToPage, pageClickHandler} from "../context/scripts";
+import {fetchAllProducts, formatPrice, goToPage, renderLoading, renderNoData} from "../context/scripts";
 
+// ctrl + alt + l -> 코드 정렬 단축키
 
 const Products = () => {
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
-    const [filterProduct, setFilterProduct] = useState(null);
+    // null -> [] 변경
+    const [filterProduct, setFilterProduct] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectCategory, setSelectCategory] = useState('전체');
     const [searchKeyword, setSearchKeyword] = useState('');
 
-    const categories = ["전체","전자기기","의류","식품","도서","생활용품","기타"];
+    const categories = ["전체", "전자기기", "의류", "식품", "도서", "생활용품", "기타"];
 
 
     useEffect(() => {
-        fetchAllProducts(axios, setProducts);
+        // 현재는 setFilterProduct 로 상품 조회 하지만 setProducts 로 변경
+        fetchAllProducts(axios, setFilterProduct, setLoading);
+        //  fetchAllProducts(axios, setProducts);
     }, []);
 
-    useEffect(() => {
-        filterProducts();
+    // useEffect(() => {
+    //     filterProducts();
+    //
+    // }, [selectCategory, searchKeyword, products]);
 
-    }, [selectCategory, searchKeyword, products]);
+
+    if(loading)  return renderLoading('게시물을 불러오는 중');
+
+    if(!products) renderLoading('상품을 찾을 수 없습니다.');
 
 
     const filterProducts = async () => {
@@ -37,7 +46,7 @@ const Products = () => {
 
     };
 
-    const handleSearch = (e)=>{
+    const handleSearch = (e) => {
         e.preventDefault();
         filterProducts();
     }
@@ -47,16 +56,10 @@ const Products = () => {
     }
     */
     const handleProductClick = (id) => {
-        goToPage(navigate,`/product/${id}`)
+        goToPage(navigate, `/product/${id}`)
     }
 
 
-    const formatPrice = (price) => {
-        return new Intl.NumberFormat("ko-KR").format(price);
-    }
-    if(loading){
-
-    }
     return (
         <div className="page-container product-list-container">
             <div className="product-header">
@@ -96,47 +99,46 @@ const Products = () => {
             </div>
 
             {/* 상품 목록*/}
-            {filterProduct.length > 0 ?(
-                <div className="product-grid">
-                    {filterProduct.map((product) => (
-                        <div key={product.id}
-                             className="product-card"
-                             onClick={() => handleProductClick(product.id)}>
-                            <div className="product-image">
-                                {product.imageUrl ? (
-                                    <img src={product.imageUrl} alt={product.productName} />
-                                ) : (
-                                    <img src="/static/img/default.png" alt="default" />
-                                )}
-                            </div>
-                            <div className="product-info">
-                                <span className="product-category">{product.category}</span>
-                                <h3 className="product-name">
-                                    {product.productName}
-                                </h3>
-                                <p className="product-code">
-                                    {product.productCode}
-                                </p>
-                                <p className="product-manufacturer">
-                                    {product.manufacturer}
-                                </p>
-                                <div className="product-footer">
+            {filterProduct.length > 0 ? (
+                    <div className="product-grid">
+                        {filterProduct.map((product) => (
+                            <div key={product.id}
+                                 className="product-card"
+                                 onClick={() => handleProductClick(product.id)}>
+                                <div className="product-image">
+                                    {product.imageUrl ? (
+                                        <img src={product.imageUrl} alt={product.productName}/>
+                                    ) : (
+                                        <img src="/static/img/default.png" alt="default"/>
+                                    )}
+                                </div>
+                                <div className="product-info">
+                                    <span className="product-category">{product.category}</span>
+                                    <h3 className="product-name">
+                                        {product.productName}
+                                    </h3>
+                                    <p className="product-code">
+                                        {product.productCode}
+                                    </p>
+                                    <p className="product-manufacturer">
+                                        {product.manufacturer}
+                                    </p>
+                                    <div className="product-footer">
                                     <span className="product-price">
-                                        {formatPrice(product.price)}원
+                                        {formatPrice(product.price)}
                                     </span>
-                                    <span className={`product-stock ${product.stock < 10 ? "매진임박" :""}`}></span>
+                                        <span
+                                            className={`product-stock ${product.stockQuantity < 10 ? "매진임박" : ""}`}></span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
-            ):(
-                <div className="no-products">
-                    <p>등록된 상품이 없습니다.</p>
-                </div>
-            )}
+                        ))}
+                    </div>
+                ) :
+                renderNoData('상품이 존재하지 않습니다.')
+            }
         </div>
     )
 }
 
-export  default Products;
+export default Products;

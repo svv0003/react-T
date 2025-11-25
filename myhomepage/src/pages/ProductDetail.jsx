@@ -1,8 +1,15 @@
 import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import axios from "axios";
-import {fetchProductDetail, renderLoading} from "../context/scripts";
+import {deleteProduct, fetchProductDetail, formatDate, formatPrice, renderLoading} from "../context/scripts";
 
+/*
+과제
+- formatDate 기능을 scripts.js 이동하기
+- 백엔드 활용해서 삭제 요청 시 비활성화 상태로 변경하기
+- formatPrice 활용하여 한국 표기로 표시하기
+- 재고 뒤에 "개" 붙이기
+ */
 
 const ProductDetail = () => {
     const {id} = useParams(); //URL 에서 id 가져오기
@@ -11,11 +18,14 @@ const ProductDetail = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchProductDetail(axios, id, setProduct, navigate);
+        fetchProductDetail(axios, id, setProduct, navigate, setLoading);
     }, [id]); // id 값이 조회될 때마다 상품 상세보기 데이터 조회
 
-    const formatPrice = (price) => {
-        return new Intl.NumberFormat("ko-KR").format(price);
+    const handleDelete = async () => {
+        if(window.confirm("정말 삭제할거임?")) {
+            await deleteProduct(axios, id, navigate);
+            setProduct({...product, isActive: "N"});
+        }
     }
 
     if(loading)  return renderLoading('게시물을 불러오는 중');
@@ -52,9 +62,73 @@ const ProductDetail = () => {
                     {product.productName}
                 </h2>
 
+                <div className="product-detail-price">
+                    <span className="price-label">상품가격</span>
+                    <span className="price-value">{formatPrice(product.price)}</span>
+                </div>
+
                 <div className="product-detail-meta">
                     <div className="meta-item">
                         <span className="meta-label">상품코드</span>
+                        <span className="meta-value">{product.productCode}</span>
+                    </div>
+                    <div className="meta-item">
+                        <span className="meta-label">제조사</span>
+                        <span className="meta-value">{product.manufacturer}</span>
+                    </div>
+                    <div className="meta-item">
+                        <span className="meta-label">재고</span>
+                        {/* <span className="meta-value">{product.stockQuantity < 10 ? product.stickQuantity+"개" : ""}</span> */}
+                        <span className={`meta-value ${product.stockQuantity < 10 ? "low-stock" : ""}`}>
+                            {product.stockQuantity < 10 ? product.stockQuantity+"개" : product.stockQuantity+"개"}
+                        </span>
+                    </div>
+                    <div className="meta-item">
+                        <span className="meta-label">판매상태</span>
+                        {/* mysql은 boolean 사용 가능하지만 oracle은 char로 확인하기 때문에 수정 필요하다. */}
+                        <span className="meta-value">{product.isActive==="Y" ? "판매중" : "판매중지"}</span>
+                    </div>
+                    <div className="meta-item">
+                        <span className="meta-label">등록일</span>
+                        {/* mysql은 boolean 사용 가능하지만 oracle은 char로 확인하기 때문에 수정 필요하다. */}
+                        <span className="meta-value">{formatDate(product.createdAt)}</span>
+                    </div>
+                    {/* 수정일 존재하고 && 생성일자와 다르다면 && (UI를 표시하겠다.) */}
+                    { product.updatedAt && product.updatedAt !== product.createdAt && (
+                        <div className="meta-item">
+                            <span className="meta-label">수정일</span>
+                            {/* mysql은 boolean 사용 가능하지만 oracle은 char로 확인하기 때문에 수정 필요하다. */}
+                            <span className="meta-value">{formatDate(product.updatedAt)}</span>
+                        </div>
+                    )}
+                    {product.description && (
+                        <div className="product-detail-description">
+
+                            <h3>상품 설명</h3>
+                            <p>{product.description}</p>
+                        </div>
+                    )}
+                    {/* admin 계정으로 로그인 시 해당 버튼 표시하기 */}
+                    <div className="pruduct-detail-buttons">
+                        <button className="btn-edit"
+                                onClick={() => navigate(`/products/edit/${id}`)}>
+                            수정하기
+                        </button>
+                        <button className="btn-delete"
+                                onClick={handleDelete}>
+                            삭제하기
+                        </button>
+                        {/*
+                        <button className="btn-delete"
+                                onClick={() => {
+                                    if(window.confirm("정말 삭제할거임?")) {
+                                        await deleteProduct(axios, id, navigate);
+                                        setProduct({...product, isActive: "N"});
+                                    }
+                                }>
+                            삭제하기
+                        </button>
+                        */}
                     </div>
                 </div>
             </div>

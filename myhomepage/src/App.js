@@ -14,10 +14,12 @@ import Chat from "./chat/Chat";
 import ProductUpload from "./pages/ProductUpload";
 import ProductDetail from "./pages/ProductDetail";
 import Products from "./pages/Products";
+import MyPageEdit from "./pages/MyPageEdit";
 // 단순히 가져와서 적용할 때는 from 생략
 // 1. 라우팅에 필요한 컴포넌트 임포트
 //    공통 스타일 임포트
 // 2. useAuth 훅 임포트
+
 
 function App() {
     const {user, isAuthenticated, logoutFn} = useAuth();
@@ -71,6 +73,7 @@ function App() {
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/mypage" element={<MyPage />} />
+                <Route path="/mypage/edit" element={<MyPageEdit />} />
                 <Route path="/write" element={<Write />} />
                 <Route path="/chat" element={<Chat />} />
                 <Route path="/upload" element={<ProductUpload />} />
