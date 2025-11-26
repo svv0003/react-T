@@ -4,18 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1e868def-a0da-43ae-a268-1f06afb61d3d" name="변경" comment="숙제">
-      <change afterPath="$PROJECT_DIR$/src/pages/MyPageEdit.jsx" afterDir="false" />
+    <list default="true" id="1e868def-a0da-43ae-a268-1f06afb61d3d" name="변경" comment="11/25">
+      <change afterPath="$PROJECT_DIR$/src/service/ApiService.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/service/scripts.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/context/scripts.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/context/scripts.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/context/AuthContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/context/AuthContext.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/context/scripts.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/Board.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/Board.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/BoardDetail.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/BoardDetail.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/Login.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/Login.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/Main.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/Main.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/MyPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/MyPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/MyPageEdit.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/MyPageEdit.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/ProductDetail.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ProductDetail.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/ProductUpload.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ProductUpload.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/Products.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/Products.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/Signup.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/Signup.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/Write.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/Write.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -26,8 +31,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="JavaScript File" />
         <option value="React Functional Component" />
+        <option value="JavaScript File" />
       </list>
     </option>
   </component>
@@ -57,29 +62,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "Node.js.Signup.jsx.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/TJ/Desktop/박세원/react-T/react-workspace/myhomepage",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.npm start.executor": "Run",
-    "npm.start.executor": "Run",
-    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2025.2.2\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Node.js.Signup.jsx.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/TJ/Desktop/박세원/react-T/react-workspace/myhomepage&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.npm start.executor&quot;: &quot;Run&quot;,
+    &quot;npm.start.executor&quot;: &quot;Run&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\IntelliJ IDEA 2025.2.2\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\TJ\Desktop\박세원\react-T\react-workspace\myhomepage\src\service" />
       <recent name="C:\Users\TJ\Desktop\박세원\react-T\react-workspace\myhomepage\public\static\img" />
     </key>
   </component>
@@ -120,7 +126,8 @@
       <workItem from="1763616398548" duration="9452000" />
       <workItem from="1763684927624" duration="18375000" />
       <workItem from="1763944712437" duration="15737000" />
-      <workItem from="1764030618775" duration="26958000" />
+      <workItem from="1764030618775" duration="27219000" />
+      <workItem from="1764117027060" duration="26656000" />
     </task>
     <task id="LOCAL-00001" summary="채팅">
       <option name="closed" value="true" />
@@ -146,7 +153,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763717195537</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="11/25">
+      <option name="closed" value="true" />
+      <created>1764061718774</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1764061718775</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -157,7 +172,8 @@
     <option name="CHECK_NEW_TODO" value="false" />
     <MESSAGE value="채팅" />
     <MESSAGE value="숙제" />
-    <option name="LAST_COMMIT_MESSAGE" value="숙제" />
+    <MESSAGE value="11/25" />
+    <option name="LAST_COMMIT_MESSAGE" value="11/25" />
     <option name="NON_MODAL_COMMIT_POSTPONE_SLOW_CHECKS" value="false" />
   </component>
 </project>

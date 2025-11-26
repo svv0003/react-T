@@ -2,12 +2,12 @@
 import {useNavigate} from "react-router-dom";
 import { useEffect } from "react";
 import AuthContext, {useAuth} from "../context/AuthContext";
-import {renderLoading} from "../context/scripts";
+import {renderLoading} from "../service/scripts";
 /*
 default export = AuthContext
         export = {useAuth}
  */
-import {boardSave, goToPage, formatDate} from "../context/scripts";
+import {boardSave, goToPage, formatDate} from "../service/scripts";
 
 
 /*
@@ -47,7 +47,6 @@ const MyPage = () => {
     return (
         <div className="page-container">
             <h1>마이페이지</h1>
-
             <div className="mypage-container">
                 <div className="mypage-section">
                     <h2>회원 정보</h2>
@@ -59,13 +58,13 @@ const MyPage = () => {
                         </div>
 
                         <div className="info-item">
-                            <span className="info-label">닉네임</span>
-                            <span className="info-value">{user.memberNickname || '-'}</span>
+                            <span className="info-label">이름</span>
+                            <span className="info-value">{user.memberName || '-'}</span>
                         </div>
 
                         <div className="info-item">
                             <span className="info-label">전화번호</span>
-                            <span className="info-value">{user.memberTel || '-'}</span>
+                            <span className="info-value">{user.memberPhone || '-'}</span>
                         </div>
 
                         <div className="info-item">
@@ -83,7 +82,11 @@ const MyPage = () => {
                         <div className="info-item">
                             <span className="info-label">가입일</span>
                             <span className="info-value">
-                                {user.createdAt ? new Date(user.createdAt).toLocaleDateString('ko-KR') : '-'}
+                                {user.memberCreatedAt
+                                    ?
+                                    new Date(user.memberCreatedAt).toLocaleDateString('ko-KR')
+                                    :
+                                    '-'}
                             </span>
                         </div>
                     </div>

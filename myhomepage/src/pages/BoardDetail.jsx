@@ -1,7 +1,8 @@
 import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import axios from "axios";
-import {fetchBoardDetail, renderLoading, goToPage} from "../context/scripts";
+import {renderLoading, goToPage} from "../service/scripts";
+import {fetchBoardDetail} from "../service/ApiService";
 import {render} from "@testing-library/react";
 
 const BoardDetail = () => {

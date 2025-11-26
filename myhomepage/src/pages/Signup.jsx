@@ -2,6 +2,10 @@
 import {useEffect, useRef, useState} from "react";
 import axios from "axios";
 import {clear} from "@testing-library/user-event/dist/clear";
+import {handleInputChange, openAddressPopup} from "../service/scripts";
+import {fetchSignup} from "../service/ApiService";
+
+
 
 const Signup = () => {
 
@@ -10,6 +14,9 @@ const Signup = () => {
         memberEmail:'',
         memberPw:'',
         memberPwConfirm:'',
+        memberPhone:'',
+        memberAddress:'',
+        memberDetailAddress:'',
         authKey:''
         /* 집주소, 전화번호 추가예정 */
 
@@ -118,7 +125,7 @@ const Signup = () => {
          */
         //console.log("응답 데이터 : ",res.data);
         //console.log("응답 상태 : ", res.status);
-        if(res.data && res.data !== null){
+        if(res.data === 1){
             setMessage(prev => ({...prev,authKey: '05:00'}));
             setTimer({min:4, sec:59, active: true});
             alert('인증번호가 발송되었습니다.');
@@ -147,6 +154,8 @@ const Signup = () => {
         }
 
         try { //프론트엔드에서 백엔드로 연결 시도
+            console.log("이메일 : ",formData.memberEmail);
+            console.log("인증키 : ",formData.authKey);
             const r = await axios.post(
                 '/api/email/checkAuthKey', // 1번 데이터 보낼 백엔드 api endPoint 작성
                 {                        // 2번 어떤 데이터를 백엔드에 어떤 명칭으로 전달할 것인지 작성
@@ -159,7 +168,7 @@ const Signup = () => {
             // 백엔드에서 특정데이터의 성공유무 확인일뿐,
             // 프론트엔드와 백엔드가 제대로 연결되어있는지 확인할 수 없다.
             // 과제 : if (r.data && r.data !== null) { ->   응답코드 1일 경우에만 인증되도록 수정
-            if (r.data && r.data !== null) {
+            if (r.data.success === true) {
                 clearInterval(timerRef.current);
                 setTimer({min:0,sec: 0,active: false});
                 setMessage(prev => ({...prev, authKey: '인증되었습니다.'}));
@@ -170,19 +179,10 @@ const Signup = () => {
                 alert('인증번호가 일치하지 않습니다.');
             }
         } catch (err) { // 백엔드연결시도를 실패했을경우
+            console.log("인증확인실패 : ",err);
             alert("인증 확인 중 서버에 연결되지 않는 오류가 발생했습니다.");
-
         }
-
-
     }
-
-
-
-
-
-
-
 
 
     // js 기능 추가
@@ -206,34 +206,8 @@ const Signup = () => {
     *
     * */
     const handleSubmit = async (e) => {
-        // 제출관련 기능 설정
-        e.preventDefault(); // 일시정시 제출상태
-        // 필수 항목 체크
-        if(!formData.memberName) {
-            alert('이름을 입력해주세요.')
-            return; // 돌려보내기 하위기능 작동x
-        }
-        // DB에 저장할 데이터만 전송
-        // body 형태로 전달하기
-        // requestBody requestParam
-        //    body         header
-        const signupData = {
-            memberName:formData.memberName,
-            memberEmail:formData.memberEmail,
-            memberPassword:formData.memberPw,
-        }
-        const res = await axios.post("/api/auth/signup",signupData);
-        if(res.data === "success" || res.status === 200) {
-            console.log("res.data   : ",res.data);
-            console.log("res.status : ",res.status);
-            alert('회원가입이 완료되었습니다.');
-            window.location.href="/";
-        }  else if(res.data === "duplicate" )
-            alert("이미 가입된 이메일 입니다.");
-        else
-            alert("회원가입에 실패하였습니다.");
-
-
+        e.preventDefault();
+        await fetchSignup(axios, formData);
         // axios.post
         // 백엔드는 무사히 저장되지만 프론트엔드에서 회원가입 실패가 뜬다.
         // 이를 해결하자
@@ -255,16 +229,17 @@ const Signup = () => {
 
     const handleChange = (e) =>{
         const {name, value} = e.target;
-        setFormData(p => ({
-            // p 기존의 name과 name 에 해당하는 value 데이터 보유한 변수이름
-            // ...p : 기존 name 키 value 데이터의 값에
-            //     , [name] : value 이벤트가 감지된 name의 value 값으로
-            //         데이터를 수정해서 추가
-            //          없던 키-값 을 추가해서
-            // formData 변수이름에 setter 로 저장
-            ...p, [name] :value
-
-        }))
+        handleInputChange(e, setFormData);
+        // setFormData(p => ({
+        //     // p 기존의 name과 name 에 해당하는 value 데이터 보유한 변수이름
+        //     // ...p : 기존 name 키 value 데이터의 값에
+        //     //     , [name] : value 이벤트가 감지된 name의 value 값으로
+        //     //         데이터를 수정해서 추가
+        //     //          없던 키-값 을 추가해서
+        //     // formData 변수이름에 setter 로 저장
+        //     ...p, [name] :value
+        //
+        // }))
     }
     return(
         <div className="page-container">
@@ -288,8 +263,6 @@ const Signup = () => {
                             type="button"
                     >인증번호 받기</button>
                 </div>
-
-
 
                 <label htmlFor="emailCheck">
                     <span className="required">*</span> 인증번호
@@ -366,7 +339,13 @@ const Signup = () => {
                 </label>
 
                 <div className="signUp-input-area">
-                    <input type="text" name="memberTel" id="memberTel" placeholder="(- 없이 숫자만 입력)" maxLength="11"/>
+                    <input type="text"
+                           name="memberPhone"
+                           id="memberPhone"
+                           value={formData.memberPhone}
+                           onChange={handleChange}
+                           placeholder="(- 없이 숫자만 입력)"
+                           maxLength="11"/>
                 </div>
 
                 <span className="signUp-message" id="telMessage">전화번호를 입력해주세요.(- 제외)</span>
@@ -375,17 +354,41 @@ const Signup = () => {
                 <label htmlFor="memberAddress">주소</label>
 
                 <div className="signUp-input-area">
-                    <input type="text" name="memberAddress" placeholder="우편번호" maxLength="6" id="postcode"/>
-
-                    <button type="button" id="searchAddress">검색</button>
+                    <input type="text"
+                           name="memberAddress"
+                           id="memberPostCode"
+                           value={formData.memberAddress}
+                           onClick={() => openAddressPopup(setFormData)}
+                           placeholder="주소 검색을 클릭하세요"
+                        /**
+                         * maxLength="6"
+                         */
+                           readOnly
+                           />
+                    <button type="button"
+                            id="searchAddress"
+                            onClick={() => openAddressPopup(setFormData)}>
+                        검색
+                    </button>
+                </div>
+                <div className="signUp-input-area">
+                    <input type="text"
+                           name="memberAddress"
+                           value={formData.memberAddress}
+                           placeholder="도로명/지번 주소"
+                           id="memberAddress"
+                           onClick={() => openAddressPopup(setFormData)}
+                           readOnly/>
                 </div>
 
                 <div className="signUp-input-area">
-                    <input type="text" name="memberAddress" placeholder="도로명/지번 주소" id="address"/>
-                </div>
-
-                <div className="signUp-input-area">
-                    <input type="text" name="memberAddress" placeholder="상세 주소" id="detailAddress"/>
+                    <input type="text"
+                           name="memberDetailAddress"
+                           value={formData.memberDetailAddress}
+                           placeholder="상세 주소를 입력하세요."
+                           id="memberDetailAddress"
+                           onChange={handleChange}
+                           required/>
                 </div>
 
                 <button id="signUpBtn">가입하기</button>

@@ -37,7 +37,6 @@ const AuthProvider = ({children}) => {
             withCredentials:true })
             .then(res => {
                 //    console.log("로그인 상태 확인 응답 : ", res.data);
-
                 setUser(res.data.user);
             })
             .catch(err => {

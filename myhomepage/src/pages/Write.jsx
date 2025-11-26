@@ -3,7 +3,8 @@ import {useState} from "react";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import {useAuth} from "../context/AuthContext";
-import {boardSave, goToPage} from "../context/scripts";
+import { goToPage, handleInputChange} from "../service/scripts";
+import {boardSave} from "../service/ApiService";
 
 /*
 user?.memberName
@@ -56,10 +57,7 @@ const Write = () => {
     }
 
     const handleChange = (e) =>{
-        const {name, value} = e.target;
-        if (name !== 'writer') { // 작성자는 수정 불가!
-            setFormData(p => ({ ...p, [name]: value }));
-        }
+        handleInputChange(e, setFormData);
     }
 
     // ok를 할 경우 게시물 목록으로 돌려보내기   기능이 하나이기 때문에 if 다음 navigate 는 {} 생략 후 작성
