@@ -104,9 +104,13 @@ const Signup = () => {
     // 인증키와 관련된 백엔드 기능을 수행하고, 수행한 결과를 표기 하기 위하여
     // 백엔드가 실행되고, 실행된 결과를 res.status 형태로 반환하기 전까지 js 하위기능 잠시 멈춤 처리
     const sendAuthKey = async  () => {
+        if(!formData.memberEmail || !formData.memberEmail.trim().length === 0) {
+            alert("이메일을 작성해주세요.");
+            return;
+        }
         // 기존 인증실패해서 0분 0초인 상태를 4분 59초 형태로 변환하기
         clearInterval(timerRef.current);
-        setTimer({min:4, sec:59, active:false});
+        setTimer({min:4, sec:59, active:true});
         // 백엔드 응답 결과를 res 라는 변수이름에 담아두기
         const res =  await  axios.post('/api/email/signup',
             formData.memberEmail, // form 데이터에서 email 전달
@@ -168,7 +172,7 @@ const Signup = () => {
             // 백엔드에서 특정데이터의 성공유무 확인일뿐,
             // 프론트엔드와 백엔드가 제대로 연결되어있는지 확인할 수 없다.
             // 과제 : if (r.data && r.data !== null) { ->   응답코드 1일 경우에만 인증되도록 수정
-            if (r.data.success === true) {
+            if (r.data === 1) {
                 clearInterval(timerRef.current);
                 setTimer({min:0,sec: 0,active: false});
                 setMessage(prev => ({...prev, authKey: '인증되었습니다.'}));

@@ -52,7 +52,6 @@ const ProductUpload = () => {
             if(!validateForm()){
                 return;
             }
-
          */
         setLoading(true);
         // 백엔드 연결 시도
