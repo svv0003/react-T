@@ -11,10 +11,9 @@ import {boardSave, goToPage, formatDate} from "../service/scripts";
 
 
 /*
-로그인 상태만 접근 허용
+로그인 상태만 접근 허용하기
 유저 정보 가져오기
-수정하기 버튼 클릭 생성
-
+수정하기 버튼 클릭 생성하기
  */
 
 const MyPage = () => {
@@ -50,23 +49,25 @@ const MyPage = () => {
             <div className="mypage-container">
                 <div className="mypage-section">
                     <h2>회원 정보</h2>
-
                     <div className="info-group">
+                        <span className="info-label">프로필</span>
+                        <div className="profile-image-container">
+                            {/* 이미지 경로는 존재하지만 이미지 파일이 존재하지 않는 경우 이미지 렌더링 실패한다. */}
+                            <img src={user.memberProfileImage || '/static/img/profile/default_profile_image.svg'}
+                                 className="profile-image"/>
+                        </div>
                         <div className="info-item">
                             <span className="info-label">이메일</span>
                             <span className="info-value">{user.memberEmail || '-'}</span>
                         </div>
-
                         <div className="info-item">
                             <span className="info-label">이름</span>
                             <span className="info-value">{user.memberName || '-'}</span>
                         </div>
-
                         <div className="info-item">
                             <span className="info-label">전화번호</span>
                             <span className="info-value">{user.memberPhone || '-'}</span>
                         </div>
-
                         <div className="info-item">
                             <span className="info-label">주소</span>
                             <span className="info-value">
@@ -78,7 +79,6 @@ const MyPage = () => {
                                 ) : '-'}
                             </span>
                         </div>
-
                         <div className="info-item">
                             <span className="info-label">가입일</span>
                             <span className="info-value">
@@ -90,12 +90,10 @@ const MyPage = () => {
                             </span>
                         </div>
                     </div>
-
                     <div className="mypage-actions">
                         <button
                             className="button btn-edit"
-                            onClick={handleClick}
-                        >
+                            onClick={handleClick}>
                             회원정보 수정
                         </button>
                     </div>

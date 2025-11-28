@@ -4,13 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1e868def-a0da-43ae-a268-1f06afb61d3d" name="변경" comment="11/26">
-      <change afterPath="$PROJECT_DIR$/public/static/img/profile/default_profile_image.svg" afterDir="false" />
+    <list default="true" id="1e868def-a0da-43ae-a268-1f06afb61d3d" name="변경" comment="11/27">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/App.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/context/AuthContext.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/context/AuthContext.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/MyPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/MyPage.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/MyPageEdit.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/MyPageEdit.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/ProductUpload.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/ProductUpload.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/Signup.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/Signup.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/ApiService.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/ApiService.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,7 +119,8 @@
       <workItem from="1763944712437" duration="15737000" />
       <workItem from="1764030618775" duration="27219000" />
       <workItem from="1764117027060" duration="26706000" />
-      <workItem from="1764203848357" duration="11429000" />
+      <workItem from="1764203848357" duration="11477000" />
+      <workItem from="1764290026804" duration="15059000" />
     </task>
     <task id="LOCAL-00001" summary="채팅">
       <option name="closed" value="true" />
@@ -160,7 +162,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764152063246</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="11/27">
+      <option name="closed" value="true" />
+      <created>1764232059938</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1764232059938</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -173,7 +183,8 @@
     <MESSAGE value="숙제" />
     <MESSAGE value="11/25" />
     <MESSAGE value="11/26" />
-    <option name="LAST_COMMIT_MESSAGE" value="11/26" />
+    <MESSAGE value="11/27" />
+    <option name="LAST_COMMIT_MESSAGE" value="11/27" />
     <option name="NON_MODAL_COMMIT_POSTPONE_SLOW_CHECKS" value="false" />
   </component>
 </project>

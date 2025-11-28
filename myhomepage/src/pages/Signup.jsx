@@ -6,6 +6,11 @@ import {handleInputChange, openAddressPopup} from "../service/scripts";
 import {fetchSignup} from "../service/ApiService";
 
 
+/*====================================
+마이페이지에서 회원가입 수정 들어가지 않고, 프로필 이미지 보여주기.
+마이페이지에서 수정하기 버튼을 눌렀을 때도 프로필 이미지 수정 반영하여 저장하기.
+회원가입 시 프로필 이미지 선택 여부 / 미선택 시 기본 이미지로 가입하기.
+====================================*/
 
 const Signup = () => {
 
@@ -17,9 +22,8 @@ const Signup = () => {
         memberPhone:'',
         memberAddress:'',
         memberDetailAddress:'',
-        authKey:''
-        /* 집주소, 전화번호 추가예정 */
-
+        authKey:'',
+        memberProfileImage: '/static/img/default-profile.svg'
     });
 // 클라이언트가 회사가 원하는 방향으로 정보를 작성하지 않았을 경우 띄워주는 메세지 초기 표기
     const [message, setMessage] = useState({
@@ -28,7 +32,6 @@ const Signup = () => {
         password : '영어, 숫자 6~20글자 사이로 입력해주세요.',
         fullname : "한글 2~5자 작성"
     })
-
     const [checkObj, setCheckObj] = useState({
         memberName:false,
         memberEmail:false,
@@ -36,13 +39,15 @@ const Signup = () => {
         memberPwConfirm:false,
         authKey:false
     })
-
     const [timer, setTimer] = useState({
         min:4,
         sec:59,
         active:false
     });
     const timerRef =useRef(null);
+    const [profileType, setProfileType] = useState('default');
+    const [profileUrl, setProfileUrl] = useState('/static/img/default-profile.svg');
+
 
 
     // 초의 경우 지속적으로 1초마다 시간을 줄이고, 0분 0초 일 경우 인증 실패 처리
@@ -245,16 +250,40 @@ const Signup = () => {
         //
         // }))
     }
+
+    const handleProfileTypeChange = (type) => {
+        setProfileType(type);
+        if (type === "default") {
+            setProfileUrl("/static/img/default-profile.svg");
+            setFormData(p => ({
+                ...p, memberProfileImage : null
+            }));
+        }
+    };
+
+    const handleChooseProfile = async (e) => {
+
+
+    }
+
+    const handleChooseNormal = (e) => {
+        // setFormData(p => ({
+        //     ...p, memberProfileImage : '/static/img/default-profile.svg'
+        // }));
+        formData.memberProfileImage.click();
+        const file = e.target.files[0];
+        const {name, value} = e.target;
+        handleInputChange(e, setFormData);
+    }
+
+
     return(
         <div className="page-container">
-
             <form onSubmit={handleSubmit}>
-
                 <label htmlFor="memberEmail">
                     <span className="required">*</span> 아이디(이메일)
                     <span className="signUp-message" id="emailMessage">{message.email}</span>
                 </label>
-
                 <div className="signUp-input-area">
                     <input type="text"
                            name="memberEmail"
@@ -267,7 +296,6 @@ const Signup = () => {
                             type="button"
                     >인증번호 받기</button>
                 </div>
-
                 <label htmlFor="emailCheck">
                     <span className="required">*</span> 인증번호
                     <span className="signUp-message" id="authKeyMessage">
@@ -283,7 +311,6 @@ const Signup = () => {
                         )}
                 </span>
                 </label>
-
                 <div className="signUp-input-area">
                     <input type="text"
                            name="authKey"
@@ -299,12 +326,9 @@ const Signup = () => {
                             onClick={checkAuthKey}
                     >인증하기</button>
                 </div>
-
-
                 <label htmlFor="memberPw">
                     <span className="required">*</span> 비밀번호
                 </label>
-
                 <div className="signUp-input-area">
                     <input type="password"
                            name="memberPw"
@@ -313,7 +337,6 @@ const Signup = () => {
                            placeholder="비밀번호"
                            maxLength="20"/>
                 </div>
-
                 <div className="signUp-input-area">
                     <input type="password"
                            name="memberPwConfirm"
@@ -322,9 +345,7 @@ const Signup = () => {
                            placeholder="비밀번호 확인"
                            maxLength="20"/>
                 </div>
-
                 <span className="signUp-message" id="pwMessage">{message.password}</span>
-
                 <label htmlFor="memberName">
                     <span className="required">*</span> 이름
                 </label>
@@ -336,12 +357,9 @@ const Signup = () => {
                            maxLength="5"/>
                 </div>
                 <span className="signUp-message" id="nickMessage">{message.fullname}</span>
-
-
-                <label htmlFor="memberTel">
+                <label htmlFor="memberPhone">
                     <span className="required">*</span> 전화번호
                 </label>
-
                 <div className="signUp-input-area">
                     <input type="text"
                            name="memberPhone"
@@ -351,12 +369,37 @@ const Signup = () => {
                            placeholder="(- 없이 숫자만 입력)"
                            maxLength="11"/>
                 </div>
-
                 <span className="signUp-message" id="telMessage">전화번호를 입력해주세요.(- 제외)</span>
 
+                <label htmlFor="memberProfile">
+                    <span className="required">*</span> 프로필 이미지
+                    <div className="radio-container">
+                        <label className="radio-option">
+                            <input type="radio"
+                                   className="radio-btn"
+                                   name="memberProfileImage"
+                                   value="default"
+                                   defaultChecked
+                                   onClick={() => handleProfileTypeChange("default")}/>
+                            기본 프로필
+                        </label>
+                        <label className="radio-option">
+                            <input type="radio"
+                                   className="radio-btn"
+                                   name="memberProfileImage"
+                                   value="selected"
+                                    onClick={() => handleProfileTypeChange("selected")}/>
+                            직접 선택
+                        </label>
+                    </div>
+                    <div className="profile-image-container">
+                        <img src={profileUrl}
+                             className="profile-image"
+                             alt="profile-image"/>
+                    </div>
+                </label>
 
                 <label htmlFor="memberAddress">주소</label>
-
                 <div className="signUp-input-area">
                     <input type="text"
                            name="memberAddress"

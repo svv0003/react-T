@@ -43,18 +43,17 @@ document.querySelector("#searchAddress").addEventListener("click",daumPostCode);
             </div>
 */
 
-
 const MyPageEdit = () => {
     const navigate = useNavigate();
-    const {user, isAuthenticated} = useAuth();
+    const {user, updateUser, isAuthenticated} = useAuth();
     /*
     useRef      리렌더링 시 현재 데이터 그대로 유지 (초기값 복원 X)
     useState    리렌더링 시 초기값 복원
      */
     const fileInputRef = useRef(null);
     const [formData, setFormData] = useState({
-        memberName: '',
-        memberEmail: '',
+        memberName: user?.memberName,
+        memberEmail: user?.memberEmail,
         memberPhone: '',
         memberPassword: '',
         memberPostCode:'',
@@ -62,6 +61,7 @@ const MyPageEdit = () => {
         memberDetailAddress: '',
         newPassword: '',
         confirmPassword: '',
+        memberProfileImage: '',
     })
     const [profileImage, setProfileImage] = useState(user?.memberProfileImage ||'/static/img/profile/default_profile_image.svg');
     const [profileFile, setProfileFile] = useState(null);
@@ -135,19 +135,16 @@ const MyPageEdit = () => {
     const handleProfileChange = async  (e) => {
         const file = e.target.files[0];
         if(!file) return;
-
         // 이미지 파일인지 확인 이미지 파일이 아닌게 맞을경우
         if(!file.type.startsWith("image/")){
             alert("이미지 파일만 업로드 가능합니다.");
             return;
         }
-
         // 파일 크기 확인 (5MB)
         if(file.size > 5 * 1024 * 1024) {
             alert("파일 크기는 5MB 를 초과할 수 없습니다.");
             return;
         }
-
         // 미리보기 표기
         const reader = new FileReader();
         reader.onloadend = (e) => {
@@ -161,19 +158,34 @@ const MyPageEdit = () => {
     const uploadProfileImage = async (file) => {
         setUploading(true);
         try {
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("memberEmail", user.memberEmail);
-            const res = await  axios.post('/api/member/profile-image', formData, {
+            const uploadFormData = new FormData();
+            uploadFormData.append("file", file);
+            uploadFormData.append("memberEmail", user.memberEmail);
+            const res = await  axios.post('/api/auth/profile-image', uploadFormData, {
                 headers: {
                     'Content-Type':'multipart/form-data'
                 }
             });
-
             if(res.data.success === true) {
                 alert("프로필 이미지가 업데이트 되었습니다.");
                 setProfileImage(res.data.imageUrl);
-                //updateUser(useAuth 또한 업데이트 진행)
+                formData.memberProfileImage = res.data.imageUrl;
+                // 세션에서 최신 사용자 정보 가져오기
+                const sessionRes = await axios.get("/api/auth/check", {
+                    withCredentials: true
+                });
+                if(sessionRes.data.user) {
+                    updateUser(sessionRes.data.user);   // 전역 user 상태
+                }
+                // updateUser(useAuth 또한 업데이트 진행)
+                /*
+                AuthContext user 정보 업데이트
+                if(updateUser) {
+                    updateUser({
+                        ...user, memberProfileImage : res.data.imageUrl
+                    })
+                }
+                 */
             }
         }catch (error) {
             alert(error);
@@ -227,6 +239,7 @@ const MyPageEdit = () => {
         //     navigate("/mypage");
         // }, 1000);
         fetchMyPageEdit(axios, formData, navigate, setIsSubmitting);
+        // fetchMyPageEditWithProfile(axios, formData, profileFile, navigate, setIsSubmitting);
     }
     /*
     게시물 작성, 수정, 상품 업로드, 수정, 회원정보 수정 동시에 사용할 것이다.
@@ -257,6 +270,7 @@ const MyPageEdit = () => {
                            onChange={handleProfileChange}
                            accept="image/*"
                            style={{ display: 'none' }}
+                           multiple
                     />
                     <span className="form-hint">이미지를 클릭하여 변경할 수 있습니다.(최대 5MB)</span>
                 </div>
@@ -359,8 +373,7 @@ const MyPageEdit = () => {
                                name="memberDetailAddress"
                                value={formData.memberDetailAddress}
                                placeholder="상세 주소를 입력하세요."
-                               onChange={handleCheckChange}
-                               required/>
+                               onChange={handleCheckChange}/>
                     </div>
                 </label>
                 <div className="form-buttons">
