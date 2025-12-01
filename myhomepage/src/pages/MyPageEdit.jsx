@@ -2,7 +2,14 @@ import {useNavigate} from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import AuthContext, {useAuth} from "../context/AuthContext";
-import {handleInputChange, openAddressPopup, validatePassword, validatePhone} from "../service/scripts";
+import {
+    handleImageChange,
+    handleInputChange,
+    handleProfileClick,
+    openAddressPopup,
+    validatePassword,
+    validatePhone
+} from "../service/scripts";
 import {fetchMyPageEdit} from "../service/ApiService";
 
 
@@ -63,8 +70,11 @@ const MyPageEdit = () => {
         confirmPassword: '',
         memberProfileImage: '',
     })
-    const [profileImage, setProfileImage] = useState(user?.memberProfileImage ||'/static/img/profile/default_profile_image.svg');
-    const [profileFile, setProfileFile] = useState(null);
+    // 현재 보여지는 프로필 이미지 URL (미리보기 포함)
+    const [profileImage, setImage] = useState(user?.memberProfileImage ||'/static/img/profile/default_profile_image.svg');
+    // 실제 업로드할 파일 객체 저장
+    const [profileFile, setFile] = useState(null);
+    // 업로드 상태 (로딩 텍스트 표시용)
     const [isUploading, setUploading] = useState(false);
     const [validation, setValidation] = useState({
         memberPhone: true,
@@ -126,36 +136,36 @@ const MyPageEdit = () => {
         }
          */
     }
-    // 프로필 이미지 클릭 시 파일 선택
-    const handleProfileClick = () => {
-        fileInputRef.current?.click();
+    // 프로필 이미지 클릭 시 파일 선택창 띄워 파일 선택
+    // const handleProfileClick = () => {
+    //     fileInputRef.current?.click();
         // 새로고침하여, 프로필이미지 초기화 되는 것이 아니라, 현재상태를 유지한 채로 클릭을 진행한다.
-    }
+    // }
     // 프로필 이미지 파일 선택
-    const handleProfileChange = async  (e) => {
-        const file = e.target.files[0];
-        if(!file) return;
-        // 이미지 파일인지 확인 이미지 파일이 아닌게 맞을경우
-        if(!file.type.startsWith("image/")){
-            alert("이미지 파일만 업로드 가능합니다.");
-            return;
-        }
-        // 파일 크기 확인 (5MB)
-        if(file.size > 5 * 1024 * 1024) {
-            alert("파일 크기는 5MB 를 초과할 수 없습니다.");
-            return;
-        }
-        // 미리보기 표기
-        const reader = new FileReader();
-        reader.onloadend = (e) => {
-            setProfileImage(e.target.result);
-        };
-        reader.readAsDataURL(file);
-        // 파일 저장
-        setProfileFile(file);
-        await  uploadProfileImage(file);
-    }
-    const uploadProfileImage = async (file) => {
+    // const handleProfileChange = async (e) => {
+    //     const file = e.target.files[0];
+    //     if(!file) return;
+    //     // 이미지 파일인지 확인 이미지 파일이 아닌게 맞을경우
+    //     if(!file.type.startsWith("image/")){
+    //         alert("이미지 파일만 업로드 가능합니다.");
+    //         return;
+    //     }
+    //     // 파일 크기 확인 (5MB)
+    //     if(file.size > 5 * 1024 * 1024) {
+    //         alert("파일 크기는 5MB 를 초과할 수 없습니다.");
+    //         return;
+    //     }
+    //     // 미리보기 표기
+    //     const reader = new FileReader();
+    //     reader.onloadend = (e) => {
+    //         setImage(e.target.result);
+    //     };
+    //     reader.readAsDataURL(file);
+    //     // 파일 저장
+    //     setFile(file);
+    //     await  uploadProfileImage(file);
+    // }
+    const uploadImage = async (file) => {
         setUploading(true);
         try {
             const uploadFormData = new FormData();
@@ -168,7 +178,7 @@ const MyPageEdit = () => {
             });
             if(res.data.success === true) {
                 alert("프로필 이미지가 업데이트 되었습니다.");
-                setProfileImage(res.data.imageUrl);
+                setImage(res.data.imageUrl);
                 formData.memberProfileImage = res.data.imageUrl;
                 // 세션에서 최신 사용자 정보 가져오기
                 const sessionRes = await axios.get("/api/auth/check", {
@@ -190,12 +200,11 @@ const MyPageEdit = () => {
         }catch (error) {
             alert(error);
             // 실패 시 원래 이미지로 복구
-            setProfileImage(user?.memberProfileImage ||'/static/img/default-profile.svg');
+            setImage(user?.memberProfileImage ||'/static/img/default-profile.svg');
         } finally {
             setUploading(false);
         }
     }
-
 
     useEffect(() => {
         const isMatch = formData.newPassword === formData.confirmPassword;
@@ -258,16 +267,16 @@ const MyPageEdit = () => {
             <form onSubmit={handleSubmit}>
                 <div className="profile-image-section">
                     <label>프로필 이미지</label>
-                    <div className="profile-image-container" onClick={handleProfileClick}>
+                    <div className="profile-image-container" onClick={() => handleProfileClick(fileInputRef)}>
                         <img src={profileImage}
                              className="profile-image"
-                        />
+                             alt="profile image"/>
                         <div className="profile-image-overlay">
                             {isUploading ? "업로드 중..." : '이미지 변경'}
                         </div>
                     </div>
                     <input type="file" ref={fileInputRef}
-                           onChange={handleProfileChange}
+                           onChange={(e) => handleImageChange(e, setImage, uploadImage)}
                            accept="image/*"
                            style={{ display: 'none' }}
                            multiple

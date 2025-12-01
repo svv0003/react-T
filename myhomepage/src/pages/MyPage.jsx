@@ -53,7 +53,7 @@ const MyPage = () => {
                         <span className="info-label">프로필</span>
                         <div className="profile-image-container">
                             {/* 이미지 경로는 존재하지만 이미지 파일이 존재하지 않는 경우 이미지 렌더링 실패한다. */}
-                            <img src={user.memberProfileImage || '/static/img/profile/default_profile_image.svg'}
+                            <img src={user?.memberProfileImage || '/static/img/profile/default_profile_image.svg'}
                                  className="profile-image"/>
                         </div>
                         <div className="info-item">
